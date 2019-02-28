@@ -1,10 +1,19 @@
 # ssh_exec
 
-A new Flutter project.
+Flutter project to SSH into a server and execute a command.
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter application.
+Download or clone the repository and open it with your editor of choice. I used Visual Studio Code.
+
+## Libraries
+
+This project uses the following flutter plugins / libraries :
+Database : sembart
+
+## TODO:
+
+## 
 
 A few resources to get you started if this is your first Flutter project:
 
