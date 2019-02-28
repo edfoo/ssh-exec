@@ -21,7 +21,6 @@ class CommandListPageState extends State<CommandListPage> {
   Server _server = Server();
   List<String> _cmdList;
   StreamSubscription _cmdStreamSubscription;
-  StreamSubscription _sessionStreamSubscription;
   TextEditingController _terminalController = TextEditingController();
   TextEditingController _updateController = TextEditingController();
   SSHClient _client;
@@ -41,11 +40,6 @@ class CommandListPageState extends State<CommandListPage> {
                 title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                // Terminal button in Application bar
-                IconButton(
-                  icon: Icon(Icons.attach_money),
-                  onPressed: () {},
-                ),
                 // Edit Button in Application Bar
                 IconButton(
                   icon: Icon(Icons.edit),
@@ -210,40 +204,38 @@ class CommandListPageState extends State<CommandListPage> {
 
     // Update the UI with progressindicator.
     _loadProgressIndicator("Connecting to server...");
-    try {
 
-      _sessionStreamSubscription =
-          _client.connect().asStream().listen((reply) async {
-        // Upon successful connection, open a shell
-        // to receive response from the server.
-        if (reply == "session_connected") {
-          if (!cancelled) {
-            _loadProgressIndicator("Running command...");
-            // Convert the .execute function's Future response
-            // to a stream in order to cancel the stream if
-            // the uses presses 'Disconnect' or 'Back'.
-            _cmdStreamSubscription = _client
-                .execute(_s.commands[_index])
-                .asStream()
-                .listen((commandOutput) {
-              if (!cancelled) {
-                if (commandOutput == "") {
-                  _cancelProgressIndicator("Command response empty");
-                } else {
-                  _cancelProgressIndicator(commandOutput);
-                }
+    try {
+      String reply = await _client.connect();
+      // Upon successful connection, open a shell
+      // to receive response from the server.
+      if (reply == "session_connected") {
+        if (!cancelled) {
+          _loadProgressIndicator("Running command...");
+          // Convert the .execute function's Future response
+          // to a stream in order to cancel the stream if
+          // the uses presses 'Disconnect' or 'Back'.
+          _cmdStreamSubscription = _client
+              .execute(_s.commands[_index])
+              .asStream()
+              .listen((commandOutput) {
+            if (!cancelled) {
+              if (commandOutput == "") {
+                _cancelProgressIndicator("Command response empty");
               } else {
-                print('Still going/n$commandOutput');
+                _cancelProgressIndicator(commandOutput);
               }
-            });
-          } else {
-            await _cmdStreamSubscription?.cancel();
-          }
+            } else {
+              print('Still going/n$commandOutput');
+            }
+          });
         } else {
-          print('REPLY : $reply');
-          _cancelProgressIndicator("Connection failed.");
+          await _cmdStreamSubscription?.cancel();
         }
-      });
+      } else {
+        print('REPLY : $reply');
+        _cancelProgressIndicator("Connection failed.");
+      }
     } on PlatformException catch (e) {
       // This is the error thrown by the plugin when
       // it is unable to connect to the server.
@@ -252,7 +244,7 @@ class CommandListPageState extends State<CommandListPage> {
         _connectionFailed('${e.code}\nError:${e.message}');
       }
     } catch (e) {
-      print('[Exception in runCommmand]: ${e.toString}');
+      print('[Exception in runCommmand]: ${e.message}');
     }
   }
 
@@ -292,9 +284,8 @@ class CommandListPageState extends State<CommandListPage> {
   void dispose() {
     cancelled = true;
     _cmdStreamSubscription?.cancel();
-    _sessionStreamSubscription.cancel();
-    _terminalController.dispose();
-    _updateController.dispose();
+    _terminalController?.dispose();
+    _updateController?.dispose();
     super.dispose();
   }
 }
