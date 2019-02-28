@@ -9,8 +9,8 @@ Download or clone the repository and open it with your editor of choice. I used 
 ## Libraries
 
 This project uses the following flutter plugins / libraries :
-[sembast](https://pub.dartlang.org/packages/sembast) database for storage.
-[flutter_ssh](https://pub.dartlang.org/packages/ssh) for SSH communication.
+- [sembast](https://pub.dartlang.org/packages/sembast) database for storage.
+- [flutter_ssh](https://pub.dartlang.org/packages/ssh) for SSH communication.
 
 ## App limitations
 - No interactive terminal.
