@@ -22,7 +22,7 @@ class MainServerGridPageState extends State<MainServerGridPage> {
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("SSH exec appbar"),
+        title: Text("SSH exec"),
         // actions: <Widget>[
         //   PopupMenuButton(
         //     onSelected: null,
@@ -67,40 +67,19 @@ class MainServerGridPageState extends State<MainServerGridPage> {
               );
             }
           }),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          FloatingActionButton(
-            heroTag: "clear",
-            child: Icon(Icons.clear),
-            onPressed: () {
-              setState(() {
-                _serverBloc.serverEventSink.add(ClearDatabaseEvent());
-              });
-            },
-          ),
-          FloatingActionButton(
-            heroTag: "refresh",
-            child: Icon(Icons.refresh),
-            onPressed: () {
-              setState(() {});
-            },
-          ),
-          FloatingActionButton(
-              heroTag: "add",
-              child: Icon(Icons.add),
-              onPressed: () {
-                // Push an empty server to the Server Sink
-                // and navigate to the page where you
-                // can add a server (SubmitServerPage).
-                _serverBloc.serverSink.add(Server());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SubmitServerPage()),
-                );
-              }),
-        ],
-      ),
+      floatingActionButton: FloatingActionButton(
+          heroTag: "add",
+          child: Icon(Icons.add),
+          onPressed: () {
+            // Push an empty server to the Server Sink
+            // and navigate to the page where you
+            // can add a server (SubmitServerPage).
+            _serverBloc.serverSink.add(Server());
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SubmitServerPage()),
+            );
+          }),
     );
   }
 

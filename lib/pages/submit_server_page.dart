@@ -171,14 +171,6 @@ class SubmitServerPageState extends State<SubmitServerPage> {
                 ),
               ),
             ),
-            // floatingActionButton: FloatingActionButton(
-            //   child: Icon(Icons.refresh),
-            //   onPressed: () {
-            //     setState(() {
-            //       print('Server Name : ${snapshot.data.name}');
-            //     });
-            //   },
-            // ),
           );
         });
   }
