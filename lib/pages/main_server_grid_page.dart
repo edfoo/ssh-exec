@@ -4,7 +4,6 @@ import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/pages/command_list_page.dart';
 import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
-import 'package:ssh_exec/events/server_event.dart';
 
 class MainServerGridPage extends StatefulWidget {
   @override

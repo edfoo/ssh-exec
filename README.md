@@ -18,7 +18,6 @@ This project uses the following flutter plugins / libraries :
 
 ## TODO:
 
-- Add confirmation dialog to server delete operation.
 - Move ssh_client to BloC??
 - Encrypt database.
 - Remove Terminal option

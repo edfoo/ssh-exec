@@ -142,42 +142,48 @@ class CommandListPageState extends State<CommandListPage> {
                         height: 235.0,
                         child: Card(
                           elevation: 20,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: _cmdList.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.elliptical(3, 3))),
-                                elevation: 5.0,
-                                margin: EdgeInsets.all(10.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisSize: MainAxisSize.min,
-                                  verticalDirection: VerticalDirection.down,
-                                  children: <Widget>[
-                                    InkWell(
-                                      onTap: () {
-                                        if (!_isBusyConnecting) {
-                                          _terminalController?.clear();
-                                          _updateController?.clear();
-                                          cancelled = false;
-                                          _runCommand(snapshot.data, index);
-                                        }
-                                      },
-                                      child: ListTile(
-                                        dense: true,
-                                        title: Center(
-                                            child: Text(
-                                                snapshot.data.commands[index])),
+                          child: (_cmdList.length > 0)
+                              ? ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _cmdList.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.elliptical(3, 3))),
+                                      elevation: 5.0,
+                                      margin: EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisSize: MainAxisSize.min,
+                                        verticalDirection:
+                                            VerticalDirection.down,
+                                        children: <Widget>[
+                                          InkWell(
+                                            onTap: () {
+                                              if (!_isBusyConnecting) {
+                                                _terminalController?.clear();
+                                                _updateController?.clear();
+                                                cancelled = false;
+                                                _runCommand(
+                                                    snapshot.data, index);
+                                              }
+                                            },
+                                            child: ListTile(
+                                              dense: true,
+                                              title: Center(
+                                                  child: Text(snapshot
+                                                      .data.commands[index])),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: Text('No commands configured for \'${snapshot.data.name}\'.')),
                         ),
                       ),
                       Container(
