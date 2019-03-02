@@ -61,8 +61,6 @@ class SubmitServerPageState extends State<SubmitServerPage> {
                         key: _formKey,
                         child: Column(
                           children: <Widget>[
-                            Text(snapshot.data.id.toString()),
-                            Text(_server.id.toString()),
                             ListTile(
                               leading: Icon(Icons.computer),
                               title: TextFormField(
