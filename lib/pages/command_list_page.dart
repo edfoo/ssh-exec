@@ -284,8 +284,6 @@ class CommandListPageState extends State<CommandListPage> {
     _cmdStreamSubscription?.cancel();
 <<<<<<< HEAD
     //_sessionStreamSubscription?.cancel();
-=======
->>>>>>> f436c7b306faf663efd03b38c36a72ed57bfacba
     _terminalController?.dispose();
     _updateController?.dispose();
     super.dispose();
