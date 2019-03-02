@@ -137,6 +137,7 @@ class SubmitServerPageState extends State<SubmitServerPage> {
                     ),
                     ListView.builder(
                       shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: _cmdList.length,
                       itemBuilder: (context, index) {
                         return ListTile(

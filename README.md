@@ -18,7 +18,6 @@ This project uses the following flutter plugins / libraries :
 
 ## TODO:
 
-- Fix SubmitServerPage scrolling issue (you have to scroll using the top container).
 - Add confirmation dialog to server delete operation.
 - Move ssh_client to BloC??
 - Encrypt database.
