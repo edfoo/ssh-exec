@@ -25,7 +25,7 @@ class CommandListPageState extends State<CommandListPage> {
   TextEditingController _terminalController = TextEditingController();
   TextEditingController _updateController = TextEditingController();
   SSHClient _client;
-  bool isBusyConnecting = false;
+  bool _isBusyConnecting = false;
   bool cancelled = false;
 
   @override
@@ -75,17 +75,6 @@ class CommandListPageState extends State<CommandListPage> {
                         borderRadius:
                             BorderRadius.all(Radius.elliptical(3, 3))),
                     child: ListTile(
-                      trailing: Column(
-                        children: <Widget>[
-                          IconButton(
-                            icon: Icon(Icons.do_not_disturb_alt),
-                            onPressed: () {
-                              _cancelConnection();
-                            },
-                          ),
-                          Text('Disconnect')
-                        ],
-                      ),
                       title: Column(
                         mainAxisSize: MainAxisSize.max,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,13 +95,24 @@ class CommandListPageState extends State<CommandListPage> {
                                       fontStyle: FontStyle.italic))),
                         ],
                       ),
+                      trailing: Column(
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(Icons.do_not_disturb_alt),
+                            onPressed: () {
+                              _cancelConnection();
+                            },
+                          ),
+                          Text('Disconnect')
+                        ],
+                      ),
                     )),
-                SingleChildScrollView(
-                  child: Column(
+                Expanded(
+                  child: ListView(
                     children: <Widget>[
                       Container(
                         padding: EdgeInsets.all(10),
-                        height: 250,
+                        height: 235.0,
                         child: Card(
                           elevation: 20,
                           child: ListView.builder(
@@ -132,7 +132,7 @@ class CommandListPageState extends State<CommandListPage> {
                                   children: <Widget>[
                                     InkWell(
                                       onTap: () {
-                                        if (!isBusyConnecting) {
+                                        if (!_isBusyConnecting) {
                                           _terminalController?.clear();
                                           _updateController?.clear();
                                           cancelled = false;
@@ -154,43 +154,25 @@ class CommandListPageState extends State<CommandListPage> {
                         ),
                       ),
                       Container(
-                        height: 250.0,
                         padding: EdgeInsets.all(10),
-                        child: Card(
-                          elevation: 20,
-                          child: SingleChildScrollView(
-                            child: Card(
-                              elevation: 5,
-                              margin: EdgeInsets.all(10.0),
-                              child: Column(
-                                children: <Widget>[
-                                  isBusyConnecting == false
-                                      ? TextField(
-                                          controller: _terminalController,
-                                          enabled: false,
-                                          maxLines: null,
-                                          decoration: InputDecoration(
-                                              border: OutlineInputBorder()),
-                                        )
-                                      : Column(
-                                          children: <Widget>[
-                                            ListTile(
-                                              title: TextField(
-                                                  controller: _updateController,
-                                                  enabled: false,
-                                                  decoration: InputDecoration(
-                                                    border:
-                                                        OutlineInputBorder(),
-                                                  )),
-                                              trailing:
-                                                  CircularProgressIndicator(),
-                                            )
-                                          ],
-                                        ),
-                                ],
-                              ),
-                            ),
-                          ),
+                        child: SingleChildScrollView(
+                          child: _isBusyConnecting == false
+                              ? TextField(
+                                  controller: _terminalController,
+                                  enabled: false,
+                                  maxLines: null,
+                                  scrollPadding: EdgeInsets.all(10),
+                                  decoration:null,
+                                )
+                              : ListTile(
+                                  title: TextField(
+                                    controller: _updateController,
+                                    enabled: false,
+                                    scrollPadding: EdgeInsets.all(10),
+                                    decoration: null,
+                                  ),
+                                  trailing: CircularProgressIndicator(),
+                                ),
                         ),
                       )
                     ],
@@ -269,14 +251,18 @@ class CommandListPageState extends State<CommandListPage> {
   // User pressed disconnect.
   void _cancelConnection() async {
     cancelled = true;
-    _cancelProgressIndicator("Connection cancelled.");
+    if (_isBusyConnecting) {
+      _cancelProgressIndicator("Connection cancelled.");
+    } else {
+      _cancelProgressIndicator("No connection in progress.");
+    }
     await _cmdStreamSubscription?.cancel();
   }
 
   void _loadProgressIndicator(String msg) {
     if (_updateController != null) {
       setState(() {
-        isBusyConnecting = true;
+        _isBusyConnecting = true;
         _updateController?.text = msg;
       });
     }
@@ -284,7 +270,7 @@ class CommandListPageState extends State<CommandListPage> {
 
   void _cancelProgressIndicator(String msg) {
     setState(() {
-      isBusyConnecting = false;
+      _isBusyConnecting = false;
       _terminalController?.text = msg;
     });
   }

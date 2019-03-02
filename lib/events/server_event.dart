@@ -1,4 +1,4 @@
-// CounterEvent is a class because most of the time you want to
+// ServerEvent is a class because most of the time you want to
 // pass some data along with the event.
 // For example query string to search for in a database.
 import 'package:ssh_exec/models/server.dart';
