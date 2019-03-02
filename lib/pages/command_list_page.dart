@@ -21,10 +21,6 @@ class CommandListPageState extends State<CommandListPage> {
   Server _server = Server();
   List<String> _cmdList;
   StreamSubscription _cmdStreamSubscription;
-<<<<<<< HEAD
-  //StreamSubscription _sessionStreamSubscription;
-=======
->>>>>>> f436c7b306faf663efd03b38c36a72ed57bfacba
   TextEditingController _terminalController = TextEditingController();
   TextEditingController _updateController = TextEditingController();
   SSHClient _client;
@@ -282,8 +278,6 @@ class CommandListPageState extends State<CommandListPage> {
   void dispose() {
     cancelled = true;
     _cmdStreamSubscription?.cancel();
-<<<<<<< HEAD
-    //_sessionStreamSubscription?.cancel();
     _terminalController?.dispose();
     _updateController?.dispose();
     super.dispose();
