@@ -1,5 +1,5 @@
 name: ssh_exec
-description: A new Flutter project.
+description: Flutter project to run commands on remote servers via SSH.
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43

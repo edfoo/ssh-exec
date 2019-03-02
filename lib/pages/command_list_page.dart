@@ -57,9 +57,37 @@ class CommandListPageState extends State<CommandListPage> {
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    _serverBloc.serverEventSink
-                        .add(RemoveServerEvent(snapshot.data));
-                    Navigator.pop(context);
+                    return showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Delete server?'),
+                            content: SingleChildScrollView(
+                              child: ListBody(
+                                children: <Widget>[
+                                  Text(
+                                      'Are you sure you want permanently remove server \'${snapshot.data.name}\'')
+                                ],
+                              ),
+                            ),
+                            actions: <Widget>[
+                              FlatButton(
+                                onPressed: () {
+                                  _serverBloc.serverEventSink
+                                      .add(RemoveServerEvent(snapshot.data));
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Yes'),
+                              ),
+                              FlatButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('Cancel'),
+                              )
+                            ],
+                          );
+                        });
                   },
                 )
               ],
@@ -161,7 +189,7 @@ class CommandListPageState extends State<CommandListPage> {
                                   enabled: false,
                                   maxLines: null,
                                   scrollPadding: EdgeInsets.all(10),
-                                  decoration:null,
+                                  decoration: null,
                                 )
                               : ListTile(
                                   title: TextField(

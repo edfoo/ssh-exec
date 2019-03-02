@@ -4,7 +4,6 @@ import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/pages/main_server_grid_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
-// TODO: Add confirmation dialog to server delete operation.
 // TODO: Move ssh_client to BloC??
 // TODO: Encrypt database.
 // TODO: Remove Terminal option
@@ -21,7 +20,7 @@ class SshExecApp extends StatelessWidget {
     return BlocProvider(
       bloc: ServerBloc(),
       child: MaterialApp(
-          title: 'SSH exec',
+          title: 'SSH Exec',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
