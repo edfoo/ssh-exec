@@ -18,6 +18,7 @@ class ServerBloc implements BlocBase {
   // Stream to handle the server state based on events
   // coming into the event stream.
   final BehaviorSubject<Server> _serverController = BehaviorSubject<Server>();
+  
   //final StreamController<Server> _serverController =
   //    StreamController<Server>.broadcast();
   Sink<Server> get serverSink => _serverController.sink;
@@ -27,7 +28,6 @@ class ServerBloc implements BlocBase {
   // events coming into the event stream.
   final StreamController<List<Server>> _serverListController =
       StreamController<List<Server>>();
-  //Sink<List<Server>> get _serverListSink => _serverListController.sink;
   Stream<List<Server>> get serverListStream => _serverListController.stream;
 
   ServerBloc() {
@@ -35,21 +35,16 @@ class ServerBloc implements BlocBase {
   }
 
   Future<void> initBloc() async {
-    print('[Creating ServerBloc]');
-    // Initialise the database.
+
     await dbControl.initDb();
 
     _serverEventController.stream.listen(_mapEventToState);
 
-    //_serverController.stream.listen(null);
-
-    // Populate the Server List Stream to update the main page
     _updateServerListStream();
   }
 
   Future<void> _mapEventToState(ServerEvent event) async {
     if (event is AddServerEvent) {
-      // TODO: Remove this function
       print("[ServerBloc.PrintServerDetails]: Server to add/edit :");
       printServerDetails(event.server);
       // Update the database.
@@ -100,8 +95,6 @@ class ServerBloc implements BlocBase {
       _server.password = rec.value['password'];
       if (rec.value['commands'] != null) {
         rec.value['commands'].forEach((cmd) {
-          // print(
-          //     '[convert]: Server ${_server.id} has command ${cmd.toString()}');
           _server.commands.add(cmd);
         });
       }
@@ -117,6 +110,7 @@ class ServerBloc implements BlocBase {
     _serverListController.close();
   }
 
+  //TODO: Remove this method
   void printServerDetails(Server _s) {
     print(
         '[ServerBloc.PrintServerDetails]: Name: ${_s.name}, ID: ${_s.id}, Address: ${_s.address}');

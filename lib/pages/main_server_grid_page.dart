@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ssh_exec/blocs/server_bloc.dart';
+import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/models/server.dart';
+import 'package:ssh_exec/models/ssh_response_message.dart';
 import 'package:ssh_exec/pages/command_list_page.dart';
+import 'package:ssh_exec/pages/command_list_page_bloc.dart';
 import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
@@ -16,18 +19,14 @@ class MainServerGridPageState extends State<MainServerGridPage> {
   ServerBloc _serverBloc;
   List<Server> _serverList = [Server()];
   bool testBool = true;
+  SshBloc _sshBloc; 
   @override
   Widget build(BuildContext context) {
     _serverBloc = BlocProvider.of<ServerBloc>(context);
+    _sshBloc = BlocProvider.of<SshBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("SSH exec"),
-        // actions: <Widget>[
-        //   PopupMenuButton(
-        //     onSelected: null,
-        //     itemBuilder: null,
-        //   )
-        // ],
       ),
       body: StreamBuilder<List<Server>>(
           initialData: _serverList,
@@ -55,10 +54,11 @@ class MainServerGridPageState extends State<MainServerGridPage> {
                       // Update the Server Sink with the server the user tapped on
                       // and navigate to the server's command list page.
                       _serverBloc.serverSink.add(snapshot.data[index]);
+                      _sshBloc.sshResultsink.add(SshResponseMessage.empty());
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CommandListPage()),
+                            builder: (context) => CommandListPageBloc()),
                       );
                     },
                   );
