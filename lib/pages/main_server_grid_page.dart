@@ -30,7 +30,7 @@ class MainServerGridPageState extends State<MainServerGridPage> {
             // Push an empty server to the Server Sink
             // and navigate to the page where you
             // can add a server (SubmitServerPage).
-            _serverBloc.serverSink.add(Server());
+            _serverBloc.serverSink.add(Server.initial());
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => SubmitServerPage()),

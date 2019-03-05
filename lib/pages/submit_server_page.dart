@@ -13,7 +13,7 @@ class SubmitServerPage extends StatefulWidget {
 }
 
 class SubmitServerPageState extends State<SubmitServerPage> {
-  Server _server = Server();
+  Server _server = Server.initial();
   static final _formKey = GlobalKey<FormState>();
   List<String> _cmdList = List<String>();
   TextEditingController _cmdTextController = TextEditingController();
@@ -23,7 +23,8 @@ class SubmitServerPageState extends State<SubmitServerPage> {
   Widget build(BuildContext context) {
     ServerBloc _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<Server>(
-        initialData: Server(),
+      // Modified.
+        initialData: Server.initial(),
         stream: _serverBloc.serverStream,
         builder: (context, snapshot) {
           // printCmdList();

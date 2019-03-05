@@ -15,12 +15,10 @@ class ServerGridWidget extends StatefulWidget {
 
 class ServerGridWidgetState extends State<ServerGridWidget> {
   ServerBloc _serverBloc;
-  List<Server> _serverList = [Server()];
-  //SshBloc _sshBloc;
+  List<Server> _serverList = [Server.initial()];
   @override
   Widget build(BuildContext context) {
     _serverBloc = BlocProvider.of<ServerBloc>(context);
-    //_sshBloc = BlocProvider.of<SshBloc>(context);
     return StreamBuilder<List<Server>>(
         initialData: _serverList,
         stream: _serverBloc.serverListStream,
@@ -45,7 +43,6 @@ class ServerGridWidgetState extends State<ServerGridWidget> {
                     print(
                         '[CmdListPage.Edit]: ${snapshot.data[index].name} : ${snapshot.data[index].id} : ${snapshot.data[index].address}');
                     _serverBloc.serverSink.add(snapshot.data[index]);
-                    //_sshBloc.sshResultsink.add(SshResponseMessage.empty());
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -79,7 +76,6 @@ class ServerGridWidgetState extends State<ServerGridWidget> {
 
   @override
   void dispose() {
-    //_sshBloc.dispose();
     super.dispose();
   }
 }

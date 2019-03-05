@@ -18,9 +18,6 @@ class ServerBloc implements BlocBase {
   // Stream to handle the server state based on events
   // coming into the event stream.
   final BehaviorSubject<Server> _serverController = BehaviorSubject<Server>();
-  
-  //final StreamController<Server> _serverController =
-  //    StreamController<Server>.broadcast();
   Sink<Server> get serverSink => _serverController.sink;
   Stream<Server> get serverStream => _serverController.stream;
 
@@ -56,9 +53,6 @@ class ServerBloc implements BlocBase {
       // statement, because otherwise the event's
       // server field is not available.
       await _updateServerStream(event.server);
-
-      //print(
-      //    '[_mapEventToState.addServerEvent]: Srv name ${event.server.name} : ${event.server.address}');
 
     } else if (event is RemoveServerEvent) {
       await dbControl.removeServerFromDb(event.server.id);

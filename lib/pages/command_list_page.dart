@@ -21,7 +21,7 @@ class CommandListPage extends StatefulWidget {
 class CommandListPageState extends State<CommandListPage> {
   ServerBloc _serverBloc;
   SshBloc _sshBloc;
-  Server _server = Server();
+  Server _server = Server.initial();
   bool cancelled = false;
 
   @override
@@ -146,7 +146,6 @@ class CommandListPageState extends State<CommandListPage> {
   void dispose() {
     cancelled = true;
     _sshBloc?.sshEventSink?.add(SshCancelEvent());
-    //_sshBloc.dispose();
     super.dispose();
   }
 }

@@ -23,7 +23,7 @@ class CommandListWidgetState extends State<CommandListWidget> {
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<Server>(
         stream: _serverBloc.serverStream,
-        initialData: Server(),
+        initialData: Server.initial(),
         builder: (context, snapshot) {
           _sshBloc = BlocProvider.of<SshBloc>(context);
           _cmdList = snapshot.data.commands;
@@ -71,11 +71,5 @@ class CommandListWidgetState extends State<CommandListWidget> {
             ),
           );
         });
-  }
-
-  @override
-  void dispose() {
-    //_sshBloc.dispose();
-    super.dispose();
   }
 }
