@@ -17,6 +17,7 @@ class CommandListWidgetState extends State<CommandListWidget> {
   Server _server = Server();
   List<String> _cmdList;
   SshBloc _sshBloc;
+  bool isBusyconnecting = true;
 
   @override
   Widget build(BuildContext context) {

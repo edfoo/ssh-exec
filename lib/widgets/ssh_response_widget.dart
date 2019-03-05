@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/models/ssh_response_message.dart';
+import 'package:ssh_exec/resources/bloc_provider.dart';
 
 
 class SshResponseWidget extends StatelessWidget {
-  final Stream<dynamic> _sshResponseStream;
 
-  SshResponseWidget(this._sshResponseStream);
+  //SshResponseWidget(this._sshResponseStream);
+  SshBloc _sshBloc;
+  final TextEditingController _updateController = TextEditingController();
+
+  void disposeUpdateController() {
+    _updateController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _updateController = TextEditingController();
 
+    _sshBloc = BlocProvider.of<SshBloc>(context);
     return StreamBuilder<SshResponseMessage>(
-        stream: _sshResponseStream,
+        stream: _sshBloc.sshResultStream,
         initialData: SshResponseMessage.empty(),
         builder: (context, snapshot) {
           _updateController.text = snapshot.data.responseString;

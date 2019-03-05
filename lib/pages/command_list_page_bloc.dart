@@ -29,8 +29,6 @@ class CommandListPageBlocState extends State<CommandListPageBloc> {
   StreamSubscription _cmdStreamSubscription;
   TextEditingController _terminalController = TextEditingController();
   TextEditingController _updateController = TextEditingController();
-  SSHClient _client;
-  bool _isBusyConnecting = false;
   bool cancelled = false;
 
   @override
@@ -135,7 +133,7 @@ class CommandListPageBlocState extends State<CommandListPageBloc> {
                             icon: Icon(Icons.do_not_disturb_alt),
                             onPressed: () {
                               _sshBloc.sshEventSink.add(SshCancelEvent());
-                              _cancelConnection();
+                              //_cancelConnection();
                             },
                           ),
                           Text('Disconnect')
@@ -146,7 +144,7 @@ class CommandListPageBlocState extends State<CommandListPageBloc> {
                   child: ListView(
                     children: <Widget>[
                       CommandListWidget(),
-                      SshResponseWidget(_sshBloc.sshResultStream),
+                      SshResponseWidget(),
                     ],
                   ),
                 )
@@ -154,24 +152,6 @@ class CommandListPageBlocState extends State<CommandListPageBloc> {
             ),
           );
         });
-  }
-
-  // User pressed disconnect.
-  void _cancelConnection() async {
-    cancelled = true;
-    if (_isBusyConnecting) {
-      _cancelProgressIndicator("Connection cancelled.");
-    } else {
-      _cancelProgressIndicator("No connection in progress.");
-    }
-    await _cmdStreamSubscription?.cancel();
-  }
-
-  void _cancelProgressIndicator(String msg) {
-    setState(() {
-      _isBusyConnecting = false;
-      _terminalController?.text = msg;
-    });
   }
 
   @override
