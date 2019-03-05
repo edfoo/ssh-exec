@@ -98,7 +98,9 @@ class SshBloc implements BlocBase {
   void _disconnect() async {
     _cancelled = true;
     await _connectionSubscription?.cancel();
-    _setResponse("Disconnected.", true);
+    if (_isBusyConnecting) {
+      _setResponse("Disconnected.", true);
+    }
     _isBusyConnecting = false;
   }
 

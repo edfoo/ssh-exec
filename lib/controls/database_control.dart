@@ -11,6 +11,8 @@ class DatabaseControl {
   String dbPath;
   DatabaseFactory dbFactory = databaseFactoryIo;
 
+  String get getDbPath => dbPath;
+
   Future<void> initDb() async {
     await Storage.localFile.then((File value) {
       dbPath = value.path;

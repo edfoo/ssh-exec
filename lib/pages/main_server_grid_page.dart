@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/models/server.dart';
+import 'package:ssh_exec/models/storage.dart';
 import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
+import 'package:ssh_exec/resources/parameters.dart';
 import 'package:ssh_exec/widgets/server_grid_widget.dart';
 
 class MainServerGridPage extends StatefulWidget {
@@ -21,6 +25,20 @@ class MainServerGridPageState extends State<MainServerGridPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("SSH exec"),
+        actions: <Widget>[
+          // Save Button
+          PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert),
+              onSelected: menuAction,
+              itemBuilder: (context) {
+                return Parameters.menuList.map((String choice) {
+                  return PopupMenuItem<String>(
+                    value: choice,
+                    child: Text(choice),
+                  );
+                }).toList();
+              })
+        ],
       ),
       body: ServerGridWidget(),
       floatingActionButton: FloatingActionButton(
@@ -37,5 +55,35 @@ class MainServerGridPageState extends State<MainServerGridPage> {
             );
           }),
     );
+  }
+
+  void menuAction(String menuItem) async {
+    String fullPath;
+    await Storage.localFile.then((File value) {
+      fullPath = value.path;
+    });
+    if (menuItem == Parameters.showPath) {
+      return showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Delete server?'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[Text('Database path:\n$fullPath')],
+                ),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Ok'),
+                ),
+              ],
+            );
+          });
+    }
   }
 }
