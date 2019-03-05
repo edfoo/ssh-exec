@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ssh_exec/blocs/server_bloc.dart';
-import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/models/server.dart';
-import 'package:ssh_exec/models/ssh_response_message.dart';
-import 'package:ssh_exec/pages/command_list_page.dart';
-import 'package:ssh_exec/pages/command_list_page_bloc.dart';
 import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
+import 'package:ssh_exec/widgets/server_grid_widget.dart';
 
 class MainServerGridPage extends StatefulWidget {
   @override
@@ -17,55 +14,15 @@ class MainServerGridPage extends StatefulWidget {
 
 class MainServerGridPageState extends State<MainServerGridPage> {
   ServerBloc _serverBloc;
-  List<Server> _serverList = [Server()];
   bool testBool = true;
-  SshBloc _sshBloc; 
   @override
   Widget build(BuildContext context) {
     _serverBloc = BlocProvider.of<ServerBloc>(context);
-    _sshBloc = BlocProvider.of<SshBloc>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("SSH exec"),
       ),
-      body: StreamBuilder<List<Server>>(
-          initialData: _serverList,
-          stream: _serverBloc.serverListStream,
-          builder: (context, snapshot) {
-            if (snapshot.data.length == 0) {
-              return Center(child: Text('No servers in database.'));
-            } else {
-              return GridView.builder(
-                shrinkWrap: true,
-                primary: true,
-                padding: EdgeInsets.all(1.0),
-                itemCount: snapshot.data.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    child: makeGridCell(
-                      snapshot.data[index].name,
-                      Icons.computer,
-                    ),
-                    onTap: () {
-                      print(
-                          '[CmdListPage.Edit]: ${snapshot.data[index].name} : ${snapshot.data[index].id} : ${snapshot.data[index].address}');
-                      // Update the Server Sink with the server the user tapped on
-                      // and navigate to the server's command list page.
-                      _serverBloc.serverSink.add(snapshot.data[index]);
-                      _sshBloc.sshResultsink.add(SshResponseMessage.empty());
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CommandListPageBloc()),
-                      );
-                    },
-                  );
-                },
-              );
-            }
-          }),
+      body: ServerGridWidget(),
       floatingActionButton: FloatingActionButton(
           heroTag: "add",
           child: Icon(Icons.add),
@@ -79,24 +36,6 @@ class MainServerGridPageState extends State<MainServerGridPage> {
               MaterialPageRoute(builder: (context) => SubmitServerPage()),
             );
           }),
-    );
-  }
-
-  Card makeGridCell(String name, IconData icon) {
-    return Card(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.elliptical(10, 10))),
-      elevation: 5.0,
-      margin: EdgeInsets.all(25.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        verticalDirection: VerticalDirection.down,
-        children: <Widget>[
-          Container(child: Center(child: Icon(icon), heightFactor: 2)),
-          Container(child: Center(child: Text(name), heightFactor: 0)),
-        ],
-      ),
     );
   }
 }

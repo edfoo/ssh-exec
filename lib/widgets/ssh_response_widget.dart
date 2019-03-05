@@ -5,9 +5,7 @@ import 'package:ssh_exec/resources/bloc_provider.dart';
 
 
 class SshResponseWidget extends StatelessWidget {
-
-  //SshResponseWidget(this._sshResponseStream);
-  SshBloc _sshBloc;
+  
   final TextEditingController _updateController = TextEditingController();
 
   void disposeUpdateController() {
@@ -16,8 +14,8 @@ class SshResponseWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    _sshBloc = BlocProvider.of<SshBloc>(context);
+    SshBloc _sshBloc = BlocProvider.of<SshBloc>(context);
+    _sshBloc.sshResultsink.add(SshResponseMessage.empty());
     return StreamBuilder<SshResponseMessage>(
         stream: _sshBloc.sshResultStream,
         initialData: SshResponseMessage.empty(),

@@ -14,7 +14,6 @@ class CommandListWidget extends StatefulWidget {
 
 class CommandListWidgetState extends State<CommandListWidget> {
   ServerBloc _serverBloc;
-  Server _server = Server();
   List<String> _cmdList;
   SshBloc _sshBloc;
   bool isBusyconnecting = true;
@@ -76,7 +75,7 @@ class CommandListWidgetState extends State<CommandListWidget> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    //_sshBloc.dispose();
     super.dispose();
   }
 }

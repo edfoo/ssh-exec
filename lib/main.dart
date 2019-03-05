@@ -6,9 +6,7 @@ import 'package:ssh_exec/pages/main_server_grid_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
 // TODO: Add 'Recent' command to MainServerGridPage.
-// TODO: Move ssh_client to BloC??
 // TODO: Encrypt database.
-// TODO: Remove Terminal option
 // TODO: Add settings menu to 'Clear database', 'Set database password' etc.
 
 

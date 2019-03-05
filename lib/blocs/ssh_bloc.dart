@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:async/async.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:ssh/ssh.dart';
 import 'package:ssh_exec/events/ssh_event.dart';
@@ -9,7 +8,6 @@ import 'package:ssh_exec/resources/bloc_base.dart';
 import 'package:flutter/services.dart';
 
 class SshBloc implements BlocBase {
-  StreamSubscription _cmdStreamSubscription;
   SSHClient _client;
   SshResponseMessage _myResponse = SshResponseMessage.empty();
   bool _isBusyConnecting = false;
@@ -28,7 +26,7 @@ class SshBloc implements BlocBase {
   Sink<SshResponseMessage> get sshResultsink => _sshResultStream.sink;
 
   SshBloc() {
-    _sshEventController.stream.listen(_mapEventToResult);
+    _sshEventController?.stream?.listen(_mapEventToResult);
   }
 
   void _mapEventToResult(SshEvent event) {
@@ -99,7 +97,7 @@ class SshBloc implements BlocBase {
 
   void _disconnect() async {
     _cancelled = true;
-    await _connectionSubscription.cancel();
+    await _connectionSubscription?.cancel();
     _setResponse("Disconnected.", true);
     _isBusyConnecting = false;
   }
@@ -115,9 +113,9 @@ class SshBloc implements BlocBase {
 
   @override
   void dispose() {
-    _disconnect();
-    _sshEventController.close();
-    _sshResultStream.close();
-    _sshEventController.close();
+    _connectionSubscription?.cancel();
+    _sshEventController?.close();
+    _sshResultStream?.close();
+    _sshEventController?.close();
   }
 }

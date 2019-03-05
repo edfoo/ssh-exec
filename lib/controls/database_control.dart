@@ -53,7 +53,7 @@ class DatabaseControl {
     //clearDb();
   }
 
-  // TODO: remove this function
+  // TODO: remove this method
   Future<void> printAllRecords() async {
     print('[Entering printAllRecords]');
     var finder = Finder(filter: Filter.matches('name', '.*'));

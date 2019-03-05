@@ -15,7 +15,6 @@ class Server {
 
   // This constructor is to get a modifiable list
   // of commands.
-  // TODO: Check if this actually helped.
   Server.initial() {
     this.id = -1;
     this.name = "";

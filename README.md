@@ -18,8 +18,6 @@ This project uses the following flutter plugins / libraries :
 
 ## TODO:
 
-- Move ssh_client to BloC??
 - Encrypt database.
-- Remove Terminal option
 - Add settings menu to 'Clear database', 'Set database password' etc.
 - Add 'Recent' command to MainServerGridPage.
