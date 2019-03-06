@@ -5,14 +5,14 @@ import 'package:ssh_exec/events/ssh_event.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
-class CommandListWidget extends StatefulWidget {
+class CommandListView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return CommandListWidgetState();
+    return CommandListViewState();
   }
 }
 
-class CommandListWidgetState extends State<CommandListWidget> {
+class CommandListViewState extends State<CommandListView> {
   ServerBloc _serverBloc;
   List<String> _cmdList;
   SshBloc _sshBloc;

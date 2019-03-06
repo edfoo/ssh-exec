@@ -4,7 +4,7 @@ import 'package:ssh_exec/models/ssh_response_message.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
 
-class SshResponseWidget extends StatelessWidget {
+class SshResponseView extends StatelessWidget {
   
   final TextEditingController _updateController = TextEditingController();
 

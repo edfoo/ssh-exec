@@ -8,8 +8,9 @@ import 'package:ssh_exec/events/ssh_event.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
-import 'package:ssh_exec/widgets/command_list_widget.dart';
-import 'package:ssh_exec/widgets/ssh_response_widget.dart';
+import 'package:ssh_exec/widgets/command_list_view.dart';
+import 'package:ssh_exec/widgets/dialogs.dart';
+import 'package:ssh_exec/widgets/ssh_response_view.dart';
 
 class CommandListPage extends StatefulWidget {
   @override
@@ -51,37 +52,7 @@ class CommandListPageState extends State<CommandListPage> {
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    return showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Delete server?'),
-                            content: SingleChildScrollView(
-                              child: ListBody(
-                                children: <Widget>[
-                                  Text(
-                                      'Are you sure you want permanently remove server \'${snapshot.data.name}\'')
-                                ],
-                              ),
-                            ),
-                            actions: <Widget>[
-                              FlatButton(
-                                onPressed: () {
-                                  _serverBloc.serverEventSink
-                                      .add(RemoveServerEvent(snapshot.data));
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                                child: Text('Yes'),
-                              ),
-                              FlatButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('Cancel'),
-                              )
-                            ],
-                          );
-                        });
+                    confirmDelete(context, snapshot.data);
                   },
                 )
               ],
@@ -131,8 +102,8 @@ class CommandListPageState extends State<CommandListPage> {
                 Expanded(
                   child: ListView(
                     children: <Widget>[
-                      CommandListWidget(),
-                      SshResponseWidget(),
+                      CommandListView(),
+                      SshResponseView(),
                     ],
                   ),
                 )
@@ -140,6 +111,15 @@ class CommandListPageState extends State<CommandListPage> {
             ),
           );
         });
+  }
+
+  confirmDelete(BuildContext context, Server server) async {
+    final dialogResponse = await Dialogs.confirm(context, 'Confirm delete',
+        'Are you sure you want permanently remove server \'${server.name}\'');
+    if (dialogResponse == DialogAction.yes) {
+      _serverBloc.serverEventSink.add(RemoveServerEvent(server));
+      Navigator.pop(context);
+    }
   }
 
   @override

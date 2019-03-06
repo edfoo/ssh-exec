@@ -2,12 +2,14 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:ssh_exec/blocs/server_bloc.dart';
+import 'package:ssh_exec/events/server_event.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/models/storage.dart';
 import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 import 'package:ssh_exec/resources/parameters.dart';
-import 'package:ssh_exec/widgets/server_grid_widget.dart';
+import 'package:ssh_exec/widgets/dialogs.dart';
+import 'package:ssh_exec/widgets/server_grid_view.dart';
 
 class MainServerGridPage extends StatefulWidget {
   @override
@@ -40,7 +42,7 @@ class MainServerGridPageState extends State<MainServerGridPage> {
               })
         ],
       ),
-      body: ServerGridWidget(),
+      body: ServerGridView(),
       floatingActionButton: FloatingActionButton(
           heroTag: "add",
           child: Icon(Icons.add),
@@ -58,32 +60,18 @@ class MainServerGridPageState extends State<MainServerGridPage> {
   }
 
   void menuAction(String menuItem) async {
-    String fullPath;
-    await Storage.localFile.then((File value) {
-      fullPath = value.path;
-    });
     if (menuItem == Parameters.showPath) {
-      return showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Delete server?'),
-              content: SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[Text('Database path:\n$fullPath')],
-                ),
-              ),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Ok'),
-                ),
-              ],
-            );
-          });
+      String fullPath;
+      await Storage.localFile.then((File value) {
+        fullPath = value.path;
+      });
+      return Dialogs().information(context, 'Database file:', fullPath);
+    }
+    else if (menuItem == Parameters.clearDB) {
+      final dialogResult = await Dialogs.confirm(context, 'Clear database?', 'Remove all servers from database?');
+      if (dialogResult == DialogAction.yes) {
+        _serverBloc.serverEventSink.add(ClearDatabaseEvent());
+      }
     }
   }
 }

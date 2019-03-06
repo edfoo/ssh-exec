@@ -6,14 +6,14 @@ import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/pages/command_list_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
-class ServerGridWidget extends StatefulWidget {
+class ServerGridView extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return ServerGridWidgetState();
+    return ServerGridViewState();
   }
 }
 
-class ServerGridWidgetState extends State<ServerGridWidget> {
+class ServerGridViewState extends State<ServerGridView> {
   ServerBloc _serverBloc;
   List<Server> _serverList = [Server.initial()];
   @override
