@@ -9,6 +9,7 @@ import 'package:ssh_exec/pages/submit_server_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 import 'package:ssh_exec/resources/parameters.dart';
 import 'package:ssh_exec/widgets/dialogs.dart';
+import 'package:ssh_exec/widgets/recent_command_view.dart';
 import 'package:ssh_exec/widgets/server_grid_view.dart';
 
 class MainServerGridPage extends StatefulWidget {
@@ -23,6 +24,7 @@ class MainServerGridPageState extends State<MainServerGridPage> {
   bool testBool = true;
   @override
   Widget build(BuildContext context) {
+    print('[Entering MainServerGridPage builder');
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return Scaffold(
       appBar: AppBar(
@@ -42,7 +44,12 @@ class MainServerGridPageState extends State<MainServerGridPage> {
               })
         ],
       ),
-      body: ServerGridView(),
+      body: Column(
+        children: <Widget>[
+          RecentCommandView(),
+          ServerGridView(),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
           heroTag: "add",
           child: Icon(Icons.add),

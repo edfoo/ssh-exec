@@ -102,7 +102,7 @@ class SshBloc implements BlocBase {
   void _setResponse(String _str, bool _isFinal) {
     _myResponse.responseString = _str;
     _myResponse.isfinalMessage = _isFinal;
-    _sshResultStream?.add(_myResponse);
+    sshResultsink?.add(_myResponse);
     if (_isFinal) {
       _isBusyConnecting = false;
     }

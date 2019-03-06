@@ -18,3 +18,9 @@ class RemoveServerEvent extends ServerEvent {
 class ClearDatabaseEvent extends ServerEvent {}
 
 class RemoveDatabaseEvent extends ServerEvent {}
+
+class AddRecentCommandEvent extends ServerEvent {
+  Server server;
+  int commandIndex;
+  AddRecentCommandEvent(this.server, this.commandIndex);
+}

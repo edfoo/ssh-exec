@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/blocs/ssh_bloc.dart';
@@ -27,6 +25,7 @@ class CommandListPageState extends State<CommandListPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('[Entering CommandListPage builder');
     _sshBloc = BlocProvider.of<SshBloc>(context);
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<Server>(

@@ -19,5 +19,4 @@ This project uses the following flutter plugins / libraries :
 ## TODO:
 
 - Encrypt database.
-- Add settings menu to 'Clear database', 'Set database password' etc.
 - Add 'Recent' command to MainServerGridPage.

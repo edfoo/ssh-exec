@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ssh_exec/blocs/server_bloc.dart';
-//import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/models/server.dart';
-//import 'package:ssh_exec/models/ssh_response_message.dart';
 import 'package:ssh_exec/pages/command_list_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
@@ -18,6 +16,7 @@ class ServerGridViewState extends State<ServerGridView> {
   List<Server> _serverList = [Server.initial()];
   @override
   Widget build(BuildContext context) {
+    print('[Entering ServerGridView builder');
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<List<Server>>(
         initialData: _serverList,

@@ -1,3 +1,7 @@
+/// Yes, there is data duplication between the key
+/// and the server id. It simplifies the conversion
+/// between Record and Server objects.
+
 import 'dart:io';
 import 'dart:async';
 
@@ -5,27 +9,22 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/models/storage.dart';
+import 'package:ssh_exec/resources/parameters.dart';
 
 class DatabaseControl {
-  Database serverDb;
-  String dbPath;
-  DatabaseFactory dbFactory = databaseFactoryIo;
+  Database _serverDb;
+  String _dbPath;
+  DatabaseFactory _dbFactory = databaseFactoryIo;
 
-  String get getDbPath => dbPath;
+  String get getDbPath => _dbPath;
 
   Future<void> initDb() async {
     await Storage.localFile.then((File value) {
-      dbPath = value.path;
+      _dbPath = value.path;
     });
-    serverDb = await dbFactory.openDatabase(dbPath);
-  }
-
-  Future<void> deleteDb() async {
-    print('Removing database');
-    await Storage.localFile.then((File value) {
-      dbPath = value.path;
-    });
-    serverDb = await dbFactory.deleteDatabase(dbPath);
+    _serverDb = await _dbFactory.openDatabase(_dbPath);
+    _serverDb.getStore(Parameters.serverStoreName);
+    _serverDb.getStore(Parameters.recentStoreName);
   }
 
   Future<void> writeServerToDatabase(Server _server) async {
@@ -34,65 +33,55 @@ class DatabaseControl {
     var finder = Finder(
         filter: Filter.equal('name', _server.name),
         sortOrders: [SortOrder('name')]);
-    var records = await serverDb.findRecord(finder);
-
-    // Yes, there is data duplicattion between the key
-    // and the server id. It simplifies the conversion
-    // between Record and Server objects.
-
-    // If no records exist, add the server.
+    var records = await _serverDb
+        ?.findStore(Parameters.serverStoreName)
+        ?.findRecord(finder);
+    Store _serverStore = _serverDb.getStore(Parameters.serverStoreName);
+    var _serverRecord =
+        Record(_serverStore, convertServerToMap(_server), _server.id);
+    // If no records exist, add the server, otherwise update the current one.
     if (records == null) {
-      print('[DatabaseControl.writeServerToDatabase] Adding server.');
-      await serverDb.put(convertServerToMap(_server), _server.id);
+      await _serverDb.putRecord(_serverRecord);
+    } else {
+      await _serverDb.putRecord(_serverRecord);
     }
-    // A record exists, so update the server in the database.
-    else {
-      print('id before update: ${_server.id.toString()}');
-      print('[DatabaseControl.writeServerToDatabase] Updating server.');
-      await serverDb.update(convertServerToMap(_server), _server.id);
-    }
-    //await countRecords();
-    //printAllRecords();
-    //clearDb();
   }
 
-  // TODO: remove this method
-  Future<void> printAllRecords() async {
-    print('[Entering printAllRecords]');
-    var finder = Finder(filter: Filter.matches('name', '.*'));
-    await serverDb.findRecords(finder).then((recList) {
-      recList.toList().forEach((rec) {
-        print('Server name: ${rec.value['name']}\nwith Key: ${rec.key}');
-        rec.value['commands'].forEach((cmd) {
-          print(cmd.toString());
-        });
-      });
-    });
+  Future<void> writeRecentToDatabase(Server _server, int commandIndex) async {
+    Store _serverStore = _serverDb.getStore(Parameters.recentStoreName);
+    Server _newServer = makeCopyWithoutCommands(_server, commandIndex);
+    await _serverStore.clear();
+    var _serverRecord =
+        Record(_serverStore, convertServerToMap(_newServer), _newServer.id);
+    await _serverDb.putRecord(_serverRecord);
   }
 
-  Future<List<Record>> getAllRecords() async {
+  Future<List<Record>> getAllServers(String storeName) async {
     List<Record> _recordList;
     var finder = Finder(filter: Filter.matches('name', '.*'));
-    await serverDb?.findRecords(finder)?.then((recList) {
+    await _serverDb?.findStore(storeName)?.findRecords(finder)?.then((recList) {
       _recordList = recList;
     });
     return _recordList;
   }
 
-  writeTest() {
-    print('[DatabaseControl.writeTest] Writing data to db');
-  }
-
-  Future<void> countRecords() async {
-    print('[DatabaseControl.countRecords] Reading data from db');
-    await serverDb.count().then((int numRecs) {
-      print('[countRecords]: ${numRecs.toString()} records in database.');
-    });
+  Future<void> removeServerFromDb(num id, String storeName) async {
+    await _serverDb?.findStore(storeName)?.delete(id);
   }
 
   Future<void> clearDb() async {
-    print('[DatabaseControl.clearDb] : Supposed to clear the database...');
-    await serverDb.clear();
+    await _serverDb.clear();
+  }
+
+  Future<void> deleteDb() async {
+    await Storage.localFile.then((File value) {
+      _dbPath = value.path;
+    });
+    _serverDb = await _dbFactory.deleteDatabase(_dbPath);
+  }
+
+  void closeDb() {
+    _serverDb.close();
   }
 
   Map convertServerToMap(Server server) {
@@ -108,16 +97,33 @@ class DatabaseControl {
     return _serverMap;
   }
 
-  Future<void> removeServerFromDb(num id) async {
-    print('id received: $id');
-    await serverDb.delete(id);
+  Server makeCopyWithoutCommands(Server _server, int commandIndex) {
+    Server _newServer = Server.initial();
+    _newServer?.id = _server?.id;
+    _newServer?.name = _server?.name;
+    _newServer?.address = _server?.address;
+    _newServer?.port = _server?.port;
+    _newServer?.username = _server?.username;
+    _newServer?.password = _server?.password;
+    _newServer?.commands?.add(_server?.commands[commandIndex]);
+    return _newServer;
   }
 
-  Future<void> removeAllServersfromDb() async {
-    // Todo: implement removeAllServersFromDb
+  // TODO: remove this method
+  Future<void> printAllStoreRecords(String storeName) async {
+    var finder = Finder(filter: Filter.matches('name', '.*'));
+    await _serverDb.findStore(storeName).findRecords(finder).then((recList) {
+      recList.toList().forEach((rec) {
+        print('Server Name here!: ${rec.value['name']} (Key: ${rec.key})');
+      });
+    });
   }
 
-  void closeDb() {
-    serverDb.close();
+  // TODO: Remove this method
+  Future<void> countRecords() async {
+    print('[DatabaseControl.countRecords] Reading data from db');
+    await _serverDb.count().then((int numRecs) {
+      print('[countRecords]: ${numRecs.toString()} records in database.');
+    });
   }
 }

@@ -7,7 +7,6 @@ import 'package:ssh_exec/resources/bloc_provider.dart';
 
 // TODO: Add 'Recent' command to MainServerGridPage.
 // TODO: Encrypt database.
-// TODO: Add settings menu to 'Clear database', 'Set database password' etc.
 
 
 void main() => runApp(SshExecApp());

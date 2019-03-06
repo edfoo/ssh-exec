@@ -6,6 +6,7 @@ import 'package:ssh_exec/controls/database_control.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/resources/bloc_base.dart';
 import 'package:ssh_exec/events/server_event.dart';
+import 'package:ssh_exec/resources/parameters.dart';
 
 class ServerBloc implements BlocBase {
   static DatabaseControl dbControl = DatabaseControl();
@@ -27,42 +28,41 @@ class ServerBloc implements BlocBase {
       StreamController<List<Server>>();
   Stream<List<Server>> get serverListStream => _serverListController.stream;
 
+  // Stream to handle the most recent command executed.
+  final StreamController<Server> _recentController = BehaviorSubject<Server>();
+  Sink<Server> get _recentSink => _recentController.sink;
+  Stream<Server> get recentStream => _recentController.stream;
+
   ServerBloc() {
     initBloc();
   }
 
   Future<void> initBloc() async {
-
     await dbControl.initDb();
-
     _serverEventController.stream.listen(_mapEventToState);
-
     _updateServerListStream();
+    _updateRecentStream();
   }
 
   Future<void> _mapEventToState(ServerEvent event) async {
     if (event is AddServerEvent) {
-      print("[ServerBloc.PrintServerDetails]: Server to add/edit :");
-      printServerDetails(event.server);
       // Update the database.
       if (event.server.id == -1) {
         event.server.id = DateTime.now().millisecondsSinceEpoch;
       }
       await dbControl.writeServerToDatabase(event.server);
-      // Can't move this command outside the if
-      // statement, because otherwise the event's
-      // server field is not available.
       await _updateServerStream(event.server);
-
     } else if (event is RemoveServerEvent) {
-      await dbControl.removeServerFromDb(event.server.id);
-
+      await dbControl.removeServerFromDb(
+          event.server.id, Parameters.serverStoreName);
     } else if (event is ClearDatabaseEvent) {
       await dbControl.clearDb();
-    }
-    else if (event is RemoveDatabaseEvent) {
+    } else if (event is RemoveDatabaseEvent) {
       await dbControl.deleteDb();
       await dbControl.initDb();
+    } else if (event is AddRecentCommandEvent) {
+      await dbControl.writeRecentToDatabase(event.server, event.commandIndex);
+      await _updateRecentStream();
     }
 
     await _updateServerListStream();
@@ -71,46 +71,60 @@ class ServerBloc implements BlocBase {
   Future<void> _updateServerListStream() async {
     // Get the new list of records (servers) from the database
     // and update the server list stream (for UI update).
-    List<Record> _recordList = await dbControl?.getAllRecords();
+    List<Record> _recordList =
+        await dbControl?.getAllServers(Parameters.serverStoreName);
     List<Server> _serverList = convertRecordsToServers(_recordList);
-    _serverListController.sink.add(_serverList);
+    _serverListController?.sink?.add(_serverList);
+  }
+
+  Future<void> _updateRecentStream() async {
+    List<Record> _recentRecordList = List<Record>();
+    List<Server> _recentServerList = List<Server>();
+    _recentRecordList = await dbControl?.getAllServers(Parameters.recentStoreName);
+    _recentServerList = convertRecordsToServers(_recentRecordList);
+    _recentSink.add(_recentServerList.first);
   }
 
   Future<void> _updateServerStream(Server _s) async {
-    _serverController.sink.add(_s);
+    _serverController?.sink?.add(_s);
   }
 
   List<Server> convertRecordsToServers(List<Record> _recordList) {
     List<Server> _serverList = List<Server>();
 
-    _recordList?.toList()?.forEach((rec) {
+    _recordList.toList().forEach((rec) {
       Server _server = Server.initial();
-      _server.id = rec.value['id'];
-      _server.name = rec.value['name'];
-      _server.address = rec.value['address'];
-      _server.port = rec.value['port'];
-      _server.username = rec.value['username'];
-      _server.password = rec.value['password'];
-      if (rec.value['commands'] != null) {
-        rec.value['commands'].forEach((cmd) {
-          _server.commands.add(cmd);
+      _server?.id = rec.value['id'];
+      _server?.name = rec.value['name'];
+      _server?.address = rec.value['address'];
+      _server?.port = rec.value['port'];
+      _server?.username = rec.value['username'];
+      _server?.password = rec.value['password'];
+      if (rec?.value['commands'] != null) {
+        rec?.value['commands'].forEach((cmd) {
+          _server?.commands?.add(cmd);
         });
       }
-      _serverList.add(_server);
+      _serverList?.add(_server);
     });
     return _serverList;
   }
 
-  @override
-  void dispose() {
-    _serverController.close();
-    _serverEventController.close();
-    _serverListController.close();
+  Server makeCopyWithoutCommands(Server _server, int commandIndex) {
+    Server _newServer = Server.initial();
+    _newServer?.id = _server?.id;
+    _newServer?.address = _server?.address;
+    _newServer?.port = _server?.port;
+    _newServer?.username = _server?.username;
+    _newServer?.password = _server?.password;
+    _newServer?.commands?.add(_server?.commands[commandIndex]);
+    return _newServer;
   }
 
-  //TODO: Remove this method
-  void printServerDetails(Server _s) {
-    print(
-        '[ServerBloc.PrintServerDetails]: Name: ${_s.name}, ID: ${_s.id}, Address: ${_s.address}');
+  @override
+  void dispose() {
+    _serverController?.close();
+    _serverEventController?.close();
+    _serverListController?.close();
   }
 }
