@@ -21,6 +21,7 @@ class DatabaseControl {
   }
 
   Future<void> deleteDb() async {
+    print('Removing database');
     await Storage.localFile.then((File value) {
       dbPath = value.path;
     });
@@ -72,7 +73,7 @@ class DatabaseControl {
   Future<List<Record>> getAllRecords() async {
     List<Record> _recordList;
     var finder = Finder(filter: Filter.matches('name', '.*'));
-    await serverDb.findRecords(finder).then((recList) {
+    await serverDb?.findRecords(finder)?.then((recList) {
       _recordList = recList;
     });
     return _recordList;

@@ -16,3 +16,5 @@ class RemoveServerEvent extends ServerEvent {
 }
 
 class ClearDatabaseEvent extends ServerEvent {}
+
+class RemoveDatabaseEvent extends ServerEvent {}

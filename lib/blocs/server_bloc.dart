@@ -60,6 +60,10 @@ class ServerBloc implements BlocBase {
     } else if (event is ClearDatabaseEvent) {
       await dbControl.clearDb();
     }
+    else if (event is RemoveDatabaseEvent) {
+      await dbControl.deleteDb();
+      await dbControl.initDb();
+    }
 
     await _updateServerListStream();
   }
@@ -67,7 +71,7 @@ class ServerBloc implements BlocBase {
   Future<void> _updateServerListStream() async {
     // Get the new list of records (servers) from the database
     // and update the server list stream (for UI update).
-    List<Record> _recordList = await dbControl.getAllRecords();
+    List<Record> _recordList = await dbControl?.getAllRecords();
     List<Server> _serverList = convertRecordsToServers(_recordList);
     _serverListController.sink.add(_serverList);
   }
@@ -79,7 +83,7 @@ class ServerBloc implements BlocBase {
   List<Server> convertRecordsToServers(List<Record> _recordList) {
     List<Server> _serverList = List<Server>();
 
-    _recordList.toList().forEach((rec) {
+    _recordList?.toList()?.forEach((rec) {
       Server _server = Server.initial();
       _server.id = rec.value['id'];
       _server.name = rec.value['name'];

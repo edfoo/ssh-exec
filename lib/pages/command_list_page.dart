@@ -115,7 +115,7 @@ class CommandListPageState extends State<CommandListPage> {
 
   confirmDelete(BuildContext context, Server server) async {
     final dialogResponse = await Dialogs.confirm(context, 'Confirm delete',
-        'Are you sure you want permanently remove server \'${server.name}\'');
+        'Are you sure you want permanently remove server \'${server.name}\'?');
     if (dialogResponse == DialogAction.yes) {
       _serverBloc.serverEventSink.add(RemoveServerEvent(server));
       Navigator.pop(context);

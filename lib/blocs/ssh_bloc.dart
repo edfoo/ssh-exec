@@ -34,8 +34,7 @@ class SshBloc implements BlocBase {
       if (!_isBusyConnecting) {
         _cancelled = false;
         _run(event.server, event.commandIndex);
-      }
-      else {
+      } else {
         print('Connection already in progress');
       }
     } else if (event is SshCancelEvent) {
@@ -44,17 +43,13 @@ class SshBloc implements BlocBase {
   }
 
   void _run(Server _s, int _index) async {
-
     _isBusyConnecting = true;
-
     _createClient(_s, _index);
-
     _connectionSubscription = _connect(_s, _index).asStream().listen((reply) {
       if (!_cancelled) {
         _setResponse(reply, true);
       }
     });
-    
   }
 
   void _createClient(Server _s, int _index) async {

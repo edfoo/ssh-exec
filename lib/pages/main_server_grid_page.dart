@@ -66,11 +66,20 @@ class MainServerGridPageState extends State<MainServerGridPage> {
         fullPath = value.path;
       });
       return Dialogs().information(context, 'Database file:', fullPath);
-    }
-    else if (menuItem == Parameters.clearDB) {
-      final dialogResult = await Dialogs.confirm(context, 'Clear database?', 'Remove all servers from database?');
+    } else if (menuItem == Parameters.clearDB) {
+      final dialogResult = await Dialogs.confirm(
+          context, 'Confirm clear', 'Remove all servers from database?');
       if (dialogResult == DialogAction.yes) {
         _serverBloc.serverEventSink.add(ClearDatabaseEvent());
+      }
+    } else if (menuItem == Parameters.removeDB) {
+      final dialogResult = await Dialogs.confirm(
+        context,
+        'Confirm remove',
+        'Completely remove database?\n(in case of corruption)',
+      );
+      if (dialogResult == DialogAction.yes) {
+        _serverBloc.serverEventSink.add(RemoveDatabaseEvent());
       }
     }
   }
