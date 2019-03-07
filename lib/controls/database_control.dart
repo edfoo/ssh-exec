@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
+import 'package:ssh_exec/models/recent_item.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/models/storage.dart';
 import 'package:ssh_exec/resources/parameters.dart';
@@ -47,12 +48,11 @@ class DatabaseControl {
     }
   }
 
-  Future<void> writeRecentToDatabase(Server _server, int commandIndex) async {
+  Future<void> writeRecentToDatabase(RecentItem item) async {
     Store _serverStore = _serverDb.getStore(Parameters.recentStoreName);
-    Server _newServer = makeCopyWithoutCommands(_server, commandIndex);
     await _serverStore.clear();
     var _serverRecord =
-        Record(_serverStore, convertServerToMap(_newServer), _newServer.id);
+        Record(_serverStore, getServerMapFromRecentItem(item), item.commandIndex);
     await _serverDb.putRecord(_serverRecord);
   }
 
@@ -65,12 +65,28 @@ class DatabaseControl {
     return _recordList;
   }
 
+  Future<bool> contains(String storeName, int key) async {
+    return await _serverDb.findStore(storeName).containsKey(key);
+  }
+
+  // TODO: remove this method.
+  Future<Record> getRecentRecordByKey(num key) async {
+    var finder = Finder(filter: Filter.byKey(key));
+    Record _recent = await _serverDb.findStore(Parameters.recentStoreName).findRecord(finder);
+    return _recent;
+  }
+
   Future<void> removeServerFromDb(num id, String storeName) async {
     await _serverDb?.findStore(storeName)?.delete(id);
   }
 
   Future<void> clearDb() async {
-    await _serverDb.clear();
+    await _serverDb.findStore(Parameters.serverStoreName).clear();
+    await _serverDb.findStore(Parameters.recentStoreName).clear();
+  }
+
+  Future<void> clearStore(String storeName) async {
+    await _serverDb.findStore(storeName).clear();
   }
 
   Future<void> deleteDb() async {
@@ -84,7 +100,27 @@ class DatabaseControl {
     _serverDb.close();
   }
 
-  Map convertServerToMap(Server server) {
+  Map<String, Map<String, dynamic>> convertRecentItemToMap(RecentItem _item) {
+    Map<String, Map<String, dynamic>> _recentItemMap = {
+      _item.commandIndex.toString() : convertServerToMap(_item.server)
+    };
+    return _recentItemMap;
+  }
+
+  Map<String, dynamic> getServerMapFromRecentItem(RecentItem _item) {
+    Map<String, dynamic> _serverMap = {
+      "id": _item.server.id,
+      "name": _item.server.name,
+      "address": _item.server.address,
+      "port": _item.server.port,
+      "username": _item.server.username,
+      "password": _item.server.password,
+      "commands": _item.server.commands
+    };
+    return _serverMap;
+  }
+
+  Map<String, dynamic> convertServerToMap(Server server) {
     Map<String, dynamic> _serverMap = {
       "id": server.id,
       "name": server.name,
@@ -97,24 +133,13 @@ class DatabaseControl {
     return _serverMap;
   }
 
-  Server makeCopyWithoutCommands(Server _server, int commandIndex) {
-    Server _newServer = Server.initial();
-    _newServer?.id = _server?.id;
-    _newServer?.name = _server?.name;
-    _newServer?.address = _server?.address;
-    _newServer?.port = _server?.port;
-    _newServer?.username = _server?.username;
-    _newServer?.password = _server?.password;
-    _newServer?.commands?.add(_server?.commands[commandIndex]);
-    return _newServer;
-  }
-
   // TODO: remove this method
   Future<void> printAllStoreRecords(String storeName) async {
-    var finder = Finder(filter: Filter.matches('name', '.*'));
+    var finder = Finder(filter: Filter.byKey('.*'));
     await _serverDb.findStore(storeName).findRecords(finder).then((recList) {
+      print('RecList Length: ${recList.length}');
       recList.toList().forEach((rec) {
-        print('Server Name here!: ${rec.value['name']} (Key: ${rec.key})');
+        print('Server key here!: ${rec.value} (Key: ${rec.key})');
       });
     });
   }

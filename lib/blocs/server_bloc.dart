@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 import 'package:sembast/sembast.dart';
 import 'package:ssh_exec/controls/database_control.dart';
+import 'package:ssh_exec/models/recent_item.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/resources/bloc_base.dart';
 import 'package:ssh_exec/events/server_event.dart';
@@ -29,9 +30,10 @@ class ServerBloc implements BlocBase {
   Stream<List<Server>> get serverListStream => _serverListController.stream;
 
   // Stream to handle the most recent command executed.
-  final StreamController<Server> _recentController = BehaviorSubject<Server>();
-  Sink<Server> get _recentSink => _recentController.sink;
-  Stream<Server> get recentStream => _recentController.stream;
+  final StreamController<RecentItem> _recentController =
+      BehaviorSubject<RecentItem>();
+  Sink<RecentItem> get _recentSink => _recentController.sink;
+  Stream<RecentItem> get recentStream => _recentController.stream;
 
   ServerBloc() {
     initBloc();
@@ -61,16 +63,17 @@ class ServerBloc implements BlocBase {
       await dbControl.deleteDb();
       await dbControl.initDb();
     } else if (event is AddRecentCommandEvent) {
-      await dbControl.writeRecentToDatabase(event.server, event.commandIndex);
+      RecentItem _recentItem = RecentItem(event.server, event.commandIndex);
+      await dbControl.writeRecentToDatabase(_recentItem);
+      _recentSink.add(_recentItem);
       await _updateRecentStream();
     }
 
     await _updateServerListStream();
+    await _updateRecentStream();
   }
 
   Future<void> _updateServerListStream() async {
-    // Get the new list of records (servers) from the database
-    // and update the server list stream (for UI update).
     List<Record> _recordList =
         await dbControl?.getAllServers(Parameters.serverStoreName);
     List<Server> _serverList = convertRecordsToServers(_recordList);
@@ -78,47 +81,67 @@ class ServerBloc implements BlocBase {
   }
 
   Future<void> _updateRecentStream() async {
-    List<Record> _recentRecordList = List<Record>();
-    List<Server> _recentServerList = List<Server>();
-    _recentRecordList = await dbControl?.getAllServers(Parameters.recentStoreName);
-    _recentServerList = convertRecordsToServers(_recentRecordList);
-    _recentSink.add(_recentServerList.first);
+    List<Record> _recordList =
+        await dbControl?.getAllServers(Parameters.recentStoreName);
+    print(_recordList.length);
+    if (_recordList.isNotEmpty) {
+      Record _recentRecord = _recordList.first;
+      if (await dbControl.contains(
+          Parameters.serverStoreName, _recentRecord.value['id'])) {
+        RecentItem _recentItem = convertRecordToRecentItem(_recentRecord);
+        _recentSink.add(_recentItem);
+      } else
+        _recentSink.add(RecentItem.empty());
+    }
   }
 
-  Future<void> _updateServerStream(Server _s) async {
-    _serverController?.sink?.add(_s);
+  Future<void> _updateServerStream(Server _server) async {
+    _serverController?.sink?.add(_server);
   }
 
   List<Server> convertRecordsToServers(List<Record> _recordList) {
     List<Server> _serverList = List<Server>();
 
-    _recordList.toList().forEach((rec) {
+    _recordList.toList().forEach((_record) {
       Server _server = Server.initial();
-      _server?.id = rec.value['id'];
-      _server?.name = rec.value['name'];
-      _server?.address = rec.value['address'];
-      _server?.port = rec.value['port'];
-      _server?.username = rec.value['username'];
-      _server?.password = rec.value['password'];
-      if (rec?.value['commands'] != null) {
-        rec?.value['commands'].forEach((cmd) {
-          _server?.commands?.add(cmd);
-        });
-      }
+      _server = convertRecordToServer(_record);
       _serverList?.add(_server);
     });
     return _serverList;
   }
 
-  Server makeCopyWithoutCommands(Server _server, int commandIndex) {
-    Server _newServer = Server.initial();
-    _newServer?.id = _server?.id;
-    _newServer?.address = _server?.address;
-    _newServer?.port = _server?.port;
-    _newServer?.username = _server?.username;
-    _newServer?.password = _server?.password;
-    _newServer?.commands?.add(_server?.commands[commandIndex]);
-    return _newServer;
+  Server convertRecordToServer(Record _record) {
+    Server _server = Server.initial();
+    _server?.id = _record.value['id'];
+    _server?.name = _record.value['name'];
+    _server?.address = _record.value['address'];
+    _server?.port = _record.value['port'];
+    _server?.username = _record.value['username'];
+    _server?.password = _record.value['password'];
+    if (_record?.value['commands'] != null) {
+      _record?.value['commands'].forEach((cmd) {
+        _server?.commands?.add(cmd);
+      });
+    }
+    return _server;
+  }
+
+  Server convertMapToServer(Map<String, dynamic> _map) {
+    Server _server = Server.initial();
+    _server.id = _map['id'];
+    _server.name = _map['name'];
+    _server.address = _map['address'];
+    _server.port = _map['port'];
+    _server.username = _map['username'];
+    _server.password = _map['password'];
+    _map['commands'].toList().forEach((cmd) {
+      _server.commands.add(cmd);
+    });
+    return _server;
+  }
+
+  RecentItem convertRecordToRecentItem(Record _record) {
+    return RecentItem(convertMapToServer(_record.value), _record.key);
   }
 
   @override
@@ -126,5 +149,6 @@ class ServerBloc implements BlocBase {
     _serverController?.close();
     _serverEventController?.close();
     _serverListController?.close();
+    _recentController?.close();
   }
 }
