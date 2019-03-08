@@ -1,6 +1,6 @@
 /// The database control service object that modifies the database.
 ///
-/// This class instantiated the database object and modifies it according to
+/// This class instantiates the database object and modifies it according to
 /// requests from the Server Bloc.
 ///
 /// Creates two stores :
