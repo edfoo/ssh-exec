@@ -70,7 +70,9 @@ class RecentCommandViewState extends State<RecentCommandView> {
                                 dense: true,
                                 title: Center(
                                     child: Text(
-                                        '${snapshot.data.server.name}: $_recentCommand')),
+                                        '${snapshot.data.server.name}: $_recentCommand',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis)),
                               ),
                             )
                           ],

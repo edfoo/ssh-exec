@@ -67,7 +67,7 @@ class ServerGridViewState extends State<ServerGridView> {
         verticalDirection: VerticalDirection.down,
         children: <Widget>[
           Container(child: Center(child: Icon(icon), heightFactor: 2)),
-          Container(child: Center(child: Text(name), heightFactor: 0)),
+          Container(child: Center(child: Text(name, maxLines: 2, overflow:TextOverflow.ellipsis,), heightFactor: 0)),
         ],
       ),
     );

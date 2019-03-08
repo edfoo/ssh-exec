@@ -60,7 +60,8 @@ class CommandListViewState extends State<CommandListView> {
                                   dense: true,
                                   title: Center(
                                       child:
-                                          Text(snapshot.data.commands[index])),
+                                          Text(snapshot.data.commands[index],maxLines: 2,
+                    overflow: TextOverflow.ellipsis)),
                                 ),
                               )
                             ],
