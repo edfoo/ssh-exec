@@ -81,8 +81,6 @@ class ServerBloc implements BlocBase {
   Future<void> _updateRecentStream() async {
     List<Record> _recordList =
         await dbControl?.getAllServers(Parameters.recentStoreName);
-    print('isEmpty: ${_recordList.isEmpty}');
-    print(_recordList);
     if (_recordList.isNotEmpty) {
       Record _recentRecord = _recordList.first;
       bool contains = await dbControl.contains(
