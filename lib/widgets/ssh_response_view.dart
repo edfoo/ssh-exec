@@ -1,4 +1,8 @@
+/// Class that displays the current action taking place during SSH connection,
+/// and then the result of the command on completion.
+
 import 'package:flutter/material.dart';
+
 import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/models/ssh_response_message.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';

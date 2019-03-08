@@ -1,3 +1,4 @@
+/// Class to store some constants used in the application.
 
 class Parameters {
   static const String dbFileName = 'sshexec.db';

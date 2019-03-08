@@ -1,4 +1,7 @@
+/// Class that displays a list of buttons with the commands for a given server.
+
 import 'package:flutter/material.dart';
+
 import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/events/server_event.dart';

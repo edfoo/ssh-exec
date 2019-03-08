@@ -1,3 +1,5 @@
+/// Describes the object that stores a server's information.
+
 class Server {
   num id, port;
   String name, address, username, password;

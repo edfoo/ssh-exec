@@ -1,3 +1,5 @@
+/// Class that provides Dialogs to the application.
+
 import 'package:flutter/material.dart';
 
 enum DialogAction { yes, cancel }

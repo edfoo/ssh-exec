@@ -1,12 +1,24 @@
-/// Yes, there is data duplication between the key
-/// and the server id. It simplifies the conversion
+/// The database control service object that modifies the database.
+///
+/// This class instantiated the database object and modifies it according to
+/// requests from the Server Bloc.
+///
+/// Creates two stores :
+/// [server] to store all server ([Server]) objects.
+/// [recent] to store the most recent command and it's server (in a [RecentItem]) object).
+///
+/// Yes, there is data duplication between the key and the server id. It simplifies the conversion
 /// between Record and Server objects.
+/// 
+/// NB: this API should actually be changed to only accept either one ([Record]) or
+/// two ([Server] and [RecentItem]) objects. Currently it intertwines with
+/// the Server Bloc, passing around any required object. Not good for API reuseability.
 
 import 'dart:io';
 import 'dart:async';
-
 import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
+
 import 'package:ssh_exec/models/recent_item.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/models/storage.dart';
@@ -28,27 +40,14 @@ class DatabaseControl {
     _serverDb.getStore(Parameters.recentStoreName);
   }
 
-  Future<void> writeServerToDatabase(Server _server) async {
-    // Find all records in the database with the same
-    // name as the incoming server.
-    var finder = Finder(
-        filter: Filter.equal('name', _server.name),
-        sortOrders: [SortOrder('name')]);
-    var records = await _serverDb
-        ?.findStore(Parameters.serverStoreName)
-        ?.findRecord(finder);
+  Future<void> writeServerToDb(Server _server) async {
     Store _serverStore = _serverDb.getStore(Parameters.serverStoreName);
     var _serverRecord =
         Record(_serverStore, convertServerToMap(_server), _server.id);
-    // If no records exist, add the server, otherwise update the current one.
-    if (records == null) {
-      await _serverDb.putRecord(_serverRecord);
-    } else {
-      await _serverDb.putRecord(_serverRecord);
-    }
+    await _serverDb.putRecord(_serverRecord);
   }
 
-  Future<void> writeRecentToDatabase(RecentItem item) async {
+  Future<void> writeRecentToDb(RecentItem item) async {
     Store _serverStore = _serverDb.getStore(Parameters.recentStoreName);
     await _serverStore.clear();
     var _serverRecord = Record(
@@ -69,7 +68,7 @@ class DatabaseControl {
     return await _serverDb.findStore(storeName).containsKey(key);
   }
 
-  Future<void> removeServerFromDb(num id) async {
+  Future<void> removeServerFromDbById(num id) async {
     await _serverDb?.findStore(Parameters.serverStoreName)?.delete(id);
     await removeRecentFromDbById(id);
   }

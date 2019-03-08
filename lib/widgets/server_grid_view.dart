@@ -1,4 +1,7 @@
+/// Class that displays the grid of servers on the main page.
+
 import 'package:flutter/material.dart';
+
 import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/pages/command_list_page.dart';

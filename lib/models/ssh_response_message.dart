@@ -1,3 +1,5 @@
+/// Describes the object that stores a response from the SSH server.
+
 class SshResponseMessage {
   bool isfinalMessage;
   String responseString;

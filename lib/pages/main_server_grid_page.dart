@@ -1,6 +1,9 @@
+/// Main page that displays the most recently executed command and the grid of servers.
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+
 import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/events/server_event.dart';
 import 'package:ssh_exec/models/server.dart';

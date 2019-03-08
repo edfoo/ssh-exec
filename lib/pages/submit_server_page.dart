@@ -1,3 +1,5 @@
+/// Page on which to edit server details.
+
 import 'package:flutter/material.dart';
 
 import 'package:ssh_exec/blocs/server_bloc.dart';

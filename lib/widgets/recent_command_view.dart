@@ -1,4 +1,7 @@
+/// Class that a button with the most recent command executed.
+
 import 'package:flutter/material.dart';
+
 import 'package:ssh_exec/blocs/server_bloc.dart';
 import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/events/ssh_event.dart';

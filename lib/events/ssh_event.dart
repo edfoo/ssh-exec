@@ -1,3 +1,5 @@
+/// Defines the different types of event that can be passed to the SSH BloC.
+
 import 'package:ssh_exec/models/server.dart';
 
 abstract class SshEvent {}

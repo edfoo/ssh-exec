@@ -1,6 +1,20 @@
+/// BloC object to handle SSH commands.
+///
+/// This class initialises the [SshBloc] object and responds to incoming SSH command
+/// events by connecting the the server, executing the command and updating the stream
+/// which in turn updates the UI.
+///
+/// It creates two StreamControllers:
+/// [_sshEventController] the manage the stream of incoming events.
+/// [_sshResultContoller] to manage the stream of results (wrapped in [SshResponse] objects) returned by
+/// the SSh command.
+/// 
+/// The SSH plugin that is used wraps JSch for Android adn NMSSH for IOS. 
+
 import 'dart:async';
 import 'package:rxdart/subjects.dart';
 import 'package:ssh/ssh.dart';
+
 import 'package:ssh_exec/events/ssh_event.dart';
 import 'package:ssh_exec/models/server.dart';
 import 'package:ssh_exec/models/ssh_response_message.dart';
@@ -14,16 +28,16 @@ class SshBloc implements BlocBase {
   bool _cancelled = false;
   StreamSubscription _connectionSubscription;
 
-// Stream to handle incoming event (execute, cancel)
+  // Stream to handle incoming event (execute, cancel)
   final StreamController<SshEvent> _sshEventController =
       StreamController<SshEvent>();
   Sink<SshEvent> get sshEventSink => _sshEventController.sink;
 
-// Stream to handle output from SSH commands to update UI
-  final BehaviorSubject<SshResponseMessage> _sshResultStream =
+  // Stream to handle output from SSH commands to update UI
+  final BehaviorSubject<SshResponseMessage> _sshResultContoller =
       BehaviorSubject<SshResponseMessage>();
-  Stream<SshResponseMessage> get sshResultStream => _sshResultStream.stream;
-  Sink<SshResponseMessage> get sshResultsink => _sshResultStream.sink;
+  Stream<SshResponseMessage> get sshResultStream => _sshResultContoller.stream;
+  Sink<SshResponseMessage> get sshResultsink => _sshResultContoller.sink;
 
   SshBloc() {
     _sshEventController?.stream?.listen(_mapEventToResult);
@@ -61,6 +75,9 @@ class SshBloc implements BlocBase {
     );
   }
 
+  // Wrap the result of the connection as returned by the ssh_plugin
+  // in a stream in order to cancel the reponse in case the user
+  // decides to cancel the connection before it completes.
   Future<String> _connect(Server _s, int _index) async {
     _setResponse('Connecting to server...', false);
     String reply;
@@ -112,7 +129,7 @@ class SshBloc implements BlocBase {
   void dispose() {
     _connectionSubscription?.cancel();
     _sshEventController?.close();
-    _sshResultStream?.close();
+    _sshResultContoller?.close();
     _sshEventController?.close();
   }
 }

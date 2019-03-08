@@ -1,6 +1,5 @@
-// ServerEvent is a class because most of the time you want to
-// pass some data along with the event.
-// For example query string to search for in a database.
+/// Defines the different types of event that can be passed to the Server BloC.
+
 import 'package:ssh_exec/models/server.dart';
 
 abstract class ServerEvent {}

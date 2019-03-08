@@ -1,7 +1,18 @@
-import 'dart:async';
+/// BloC object to handle all server modification, addition and removal events.
+///
+/// This class initalises the [ServerBloc] object and responds to incoming server state modification
+/// events by changing the database and updating the streams to in turn update the UI.
+///
+/// It creates four StreamControllers :
+/// [_serverEventController] to manage the stream of incoming events.
+/// [_serverController] to manage the stream of the single latest relevant server ([Server] object).
+/// [_serverListController] to manage the stream of all servers ([List<Server>]) currently in the database.
+/// [_recentController] to manage the stream of the most recent command executed and it's server ([List<RecentItem>]).
 
+import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 import 'package:sembast/sembast.dart';
+
 import 'package:ssh_exec/controls/database_control.dart';
 import 'package:ssh_exec/models/recent_item.dart';
 import 'package:ssh_exec/models/server.dart';
@@ -39,6 +50,8 @@ class ServerBloc implements BlocBase {
     _initBloc();
   }
 
+  // Read data from the database and update the
+  // streams when the application starts.
   Future<void> _initBloc() async {
     await dbControl.initDb();
     _serverEventController.stream.listen(_mapEventToState);
@@ -51,11 +64,10 @@ class ServerBloc implements BlocBase {
       if (event.server.id == -1) {
         event.server.id = DateTime.now().millisecondsSinceEpoch;
       }
-      await dbControl.writeServerToDatabase(event.server);
+      await dbControl.writeServerToDb(event.server);
       await _updateServerStream(event.server);
     } else if (event is RemoveServerEvent) {
-      await dbControl.removeServerFromDb(
-          event.server.id);
+      await dbControl.removeServerFromDbById(event.server.id);
     } else if (event is ClearDatabaseEvent) {
       await dbControl.clearDb();
     } else if (event is RemoveDatabaseEvent) {
@@ -63,7 +75,7 @@ class ServerBloc implements BlocBase {
       await dbControl.initDb();
     } else if (event is AddRecentCommandEvent) {
       RecentItem _recentItem = RecentItem(event.server, event.commandIndex);
-      await dbControl.writeRecentToDatabase(_recentItem);
+      await dbControl.writeRecentToDb(_recentItem);
       _recentSink.add(_recentItem);
     }
 
@@ -78,6 +90,8 @@ class ServerBloc implements BlocBase {
     _serverListController?.sink?.add(_serverList);
   }
 
+  // Only update the most recent command if it is still
+  // present in the server database store.
   Future<void> _updateRecentStream() async {
     List<Record> _recordList =
         await dbControl?.getAllServers(Parameters.recentStoreName);

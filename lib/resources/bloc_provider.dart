@@ -1,4 +1,7 @@
+/// Generic BloC provider class.
+
 import 'package:flutter/material.dart';
+
 import 'package:ssh_exec/resources/bloc_base.dart';
 
 Type _typeOf<T>() => T;
