@@ -12,6 +12,4 @@ class Server {
     this.password = "";
     this.commands = [];
   }
-
-  num get getId => id;
 }

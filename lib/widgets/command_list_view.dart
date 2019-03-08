@@ -21,7 +21,6 @@ class CommandListViewState extends State<CommandListView> {
 
   @override
   Widget build(BuildContext context) {
-    print('[Entering CommandListView builder');
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<Server>(
         stream: _serverBloc.serverStream,
@@ -54,14 +53,16 @@ class CommandListViewState extends State<CommandListView> {
                                 onTap: () {
                                   _sshBloc.sshEventSink.add(
                                       SshExecuteEvent(snapshot.data, index));
-                                      _serverBloc.serverEventSink.add(AddRecentCommandEvent(snapshot.data, index));
+                                  _serverBloc.serverEventSink.add(
+                                      AddRecentCommandEvent(
+                                          snapshot.data, index));
                                 },
                                 child: ListTile(
                                   dense: true,
                                   title: Center(
-                                      child:
-                                          Text(snapshot.data.commands[index],maxLines: 2,
-                    overflow: TextOverflow.ellipsis)),
+                                      child: Text(snapshot.data.commands[index],
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis)),
                                 ),
                               )
                             ],

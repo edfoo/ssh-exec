@@ -16,7 +16,6 @@ class ServerGridViewState extends State<ServerGridView> {
   List<Server> _serverList = [Server.initial()];
   @override
   Widget build(BuildContext context) {
-    print('[Entering ServerGridView builder');
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<List<Server>>(
         initialData: _serverList,
@@ -37,8 +36,6 @@ class ServerGridViewState extends State<ServerGridView> {
                     Icons.computer,
                   ),
                   onTap: () {
-                    print(
-                        '[CmdListPage.Edit]: ${snapshot.data[index].name} : ${snapshot.data[index].id} : ${snapshot.data[index].address}');
                     _serverBloc.serverSink.add(snapshot.data[index]);
                     Navigator.push(
                       context,
@@ -67,7 +64,14 @@ class ServerGridViewState extends State<ServerGridView> {
         verticalDirection: VerticalDirection.down,
         children: <Widget>[
           Container(child: Center(child: Icon(icon), heightFactor: 2)),
-          Container(child: Center(child: Text(name, maxLines: 2, overflow:TextOverflow.ellipsis,), heightFactor: 0)),
+          Container(
+              child: Center(
+                  child: Text(
+                    name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  heightFactor: 0)),
         ],
       ),
     );

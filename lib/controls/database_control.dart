@@ -69,15 +69,6 @@ class DatabaseControl {
     return await _serverDb.findStore(storeName).containsKey(key);
   }
 
-  // TODO: remove this method.
-  Future<Record> getRecentRecordByKey(num key) async {
-    var finder = Finder(filter: Filter.byKey(key));
-    Record _recent = await _serverDb
-        .findStore(Parameters.recentStoreName)
-        .findRecord(finder);
-    return _recent;
-  }
-
   Future<void> removeServerFromDb(num id) async {
     await _serverDb?.findStore(Parameters.serverStoreName)?.delete(id);
     await removeRecentFromDbById(id);
@@ -146,24 +137,5 @@ class DatabaseControl {
       "commands": server.commands
     };
     return _serverMap;
-  }
-
-  // TODO: remove this method
-  Future<void> printAllStoreRecords(String storeName) async {
-    var finder = Finder(filter: Filter.byKey('.*'));
-    await _serverDb.findStore(storeName).findRecords(finder).then((recList) {
-      print('RecList Length: ${recList.length}');
-      recList.toList().forEach((rec) {
-        print('Server key here!: ${rec.value} (Key: ${rec.key})');
-      });
-    });
-  }
-
-  // TODO: Remove this method
-  Future<void> countRecords() async {
-    print('[DatabaseControl.countRecords] Reading data from db');
-    await _serverDb.count().then((int numRecs) {
-      print('[countRecords]: ${numRecs.toString()} records in database.');
-    });
   }
 }

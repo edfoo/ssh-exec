@@ -5,7 +5,6 @@ import 'package:ssh_exec/blocs/ssh_bloc.dart';
 import 'package:ssh_exec/pages/main_server_grid_page.dart';
 import 'package:ssh_exec/resources/bloc_provider.dart';
 
-// TODO: Add 'Recent' command to MainServerGridPage.
 // TODO: Encrypt database.
 
 

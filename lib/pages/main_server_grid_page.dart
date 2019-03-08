@@ -24,7 +24,6 @@ class MainServerGridPageState extends State<MainServerGridPage> {
   bool testBool = true;
   @override
   Widget build(BuildContext context) {
-    print('[Entering MainServerGridPage builder');
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return Scaffold(
       appBar: AppBar(

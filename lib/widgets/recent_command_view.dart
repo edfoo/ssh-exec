@@ -21,7 +21,6 @@ class RecentCommandViewState extends State<RecentCommandView> {
 
   @override
   Widget build(BuildContext context) {
-    print('[Entering RecentCommandView builder');
     _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<RecentItem>(
         stream: _serverBloc.recentStream,

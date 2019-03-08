@@ -23,11 +23,9 @@ class SubmitServerPageState extends State<SubmitServerPage> {
   Widget build(BuildContext context) {
     ServerBloc _serverBloc = BlocProvider.of<ServerBloc>(context);
     return StreamBuilder<Server>(
-      // Modified.
         initialData: Server.initial(),
         stream: _serverBloc.serverStream,
         builder: (context, snapshot) {
-          // printCmdList();
           // If this is not a new server,
           // copy the commands into _cmdList.
           if (snapshot.data.id != -1) {
@@ -173,13 +171,6 @@ class SubmitServerPageState extends State<SubmitServerPage> {
             ),
           );
         });
-  }
-
-  //TODO: Remove this method
-  void printCmdList() {
-    _cmdList.forEach((srv) {
-      print(srv.toString());
-    });
   }
 
   void _addCommand() {
