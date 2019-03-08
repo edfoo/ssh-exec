@@ -19,4 +19,3 @@ This project uses the following flutter plugins / libraries :
 ## TODO:
 
 - Encrypt database.
-- Add 'Recent' command to MainServerGridPage.
