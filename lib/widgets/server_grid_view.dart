@@ -22,9 +22,7 @@ class ServerGridViewState extends State<ServerGridView> {
         initialData: _serverList,
         stream: _serverBloc.serverListStream,
         builder: (context, snapshot) {
-          if (snapshot.data.length == 0) {
-            return Center(child: Text('No servers in database.'));
-          } else {
+          if (snapshot.data.length != 0) {
             return GridView.builder(
               shrinkWrap: true,
               primary: true,
@@ -51,6 +49,8 @@ class ServerGridViewState extends State<ServerGridView> {
                 );
               },
             );
+          } else {
+            return Center(child: Text('No servers in database.'));
           }
         });
   }

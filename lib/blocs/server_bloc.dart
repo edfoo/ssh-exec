@@ -36,10 +36,10 @@ class ServerBloc implements BlocBase {
   Stream<RecentItem> get recentStream => _recentController.stream;
 
   ServerBloc() {
-    initBloc();
+    _initBloc();
   }
 
-  Future<void> initBloc() async {
+  Future<void> _initBloc() async {
     await dbControl.initDb();
     _serverEventController.stream.listen(_mapEventToState);
     _updateServerListStream();
@@ -48,7 +48,6 @@ class ServerBloc implements BlocBase {
 
   Future<void> _mapEventToState(ServerEvent event) async {
     if (event is AddServerEvent) {
-      // Update the database.
       if (event.server.id == -1) {
         event.server.id = DateTime.now().millisecondsSinceEpoch;
       }
@@ -56,7 +55,7 @@ class ServerBloc implements BlocBase {
       await _updateServerStream(event.server);
     } else if (event is RemoveServerEvent) {
       await dbControl.removeServerFromDb(
-          event.server.id, Parameters.serverStoreName);
+          event.server.id);
     } else if (event is ClearDatabaseEvent) {
       await dbControl.clearDb();
     } else if (event is RemoveDatabaseEvent) {
@@ -66,7 +65,6 @@ class ServerBloc implements BlocBase {
       RecentItem _recentItem = RecentItem(event.server, event.commandIndex);
       await dbControl.writeRecentToDatabase(_recentItem);
       _recentSink.add(_recentItem);
-      await _updateRecentStream();
     }
 
     await _updateServerListStream();
@@ -83,15 +81,18 @@ class ServerBloc implements BlocBase {
   Future<void> _updateRecentStream() async {
     List<Record> _recordList =
         await dbControl?.getAllServers(Parameters.recentStoreName);
-    print(_recordList.length);
+    print('isEmpty: ${_recordList.isEmpty}');
+    print(_recordList);
     if (_recordList.isNotEmpty) {
       Record _recentRecord = _recordList.first;
-      if (await dbControl.contains(
-          Parameters.serverStoreName, _recentRecord.value['id'])) {
+      bool contains = await dbControl.contains(
+          Parameters.serverStoreName, _recentRecord.value['id']);
+      if (contains) {
         RecentItem _recentItem = convertRecordToRecentItem(_recentRecord);
         _recentSink.add(_recentItem);
-      } else
-        _recentSink.add(RecentItem.empty());
+      }
+    } else {
+      _recentSink.add(RecentItem.empty());
     }
   }
 

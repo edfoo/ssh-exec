@@ -51,8 +51,8 @@ class DatabaseControl {
   Future<void> writeRecentToDatabase(RecentItem item) async {
     Store _serverStore = _serverDb.getStore(Parameters.recentStoreName);
     await _serverStore.clear();
-    var _serverRecord =
-        Record(_serverStore, getServerMapFromRecentItem(item), item.commandIndex);
+    var _serverRecord = Record(
+        _serverStore, getServerMapFromRecentItem(item), item.commandIndex);
     await _serverDb.putRecord(_serverRecord);
   }
 
@@ -72,12 +72,27 @@ class DatabaseControl {
   // TODO: remove this method.
   Future<Record> getRecentRecordByKey(num key) async {
     var finder = Finder(filter: Filter.byKey(key));
-    Record _recent = await _serverDb.findStore(Parameters.recentStoreName).findRecord(finder);
+    Record _recent = await _serverDb
+        .findStore(Parameters.recentStoreName)
+        .findRecord(finder);
     return _recent;
   }
 
-  Future<void> removeServerFromDb(num id, String storeName) async {
-    await _serverDb?.findStore(storeName)?.delete(id);
+  Future<void> removeServerFromDb(num id) async {
+    await _serverDb?.findStore(Parameters.serverStoreName)?.delete(id);
+    await removeRecentFromDbById(id);
+  }
+
+  Future<void> removeRecentFromDbById(num id) async {
+    var finder = Finder(filter: Filter.byKey(0));
+    Record _recentRecord = await _serverDb
+        .findStore(Parameters.recentStoreName)
+        .findRecord(finder);
+    if (_recentRecord != null) {
+      if (_recentRecord.value['id'] == id) {
+        await _serverDb.findStore(Parameters.recentStoreName).clear();
+      }
+    }
   }
 
   Future<void> clearDb() async {
@@ -102,7 +117,7 @@ class DatabaseControl {
 
   Map<String, Map<String, dynamic>> convertRecentItemToMap(RecentItem _item) {
     Map<String, Map<String, dynamic>> _recentItemMap = {
-      _item.commandIndex.toString() : convertServerToMap(_item.server)
+      _item.commandIndex.toString(): convertServerToMap(_item.server)
     };
     return _recentItemMap;
   }

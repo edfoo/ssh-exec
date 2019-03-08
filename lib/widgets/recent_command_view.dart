@@ -78,7 +78,7 @@ class RecentCommandViewState extends State<RecentCommandView> {
                       );
                     },
                   )
-                : Center(child: Text('No recent commands.')),
+                : Center(child: Text('No recent command.')),
           );
         });
   }

@@ -77,7 +77,9 @@ class MainServerGridPageState extends State<MainServerGridPage> {
       final dialogResult = await Dialogs.confirm(
           context, 'Confirm clear', 'Remove all servers from database?');
       if (dialogResult == DialogAction.yes) {
-        _serverBloc.serverEventSink.add(ClearDatabaseEvent());
+        setState(() {
+          _serverBloc.serverEventSink.add(ClearDatabaseEvent());
+        });
       }
     } else if (menuItem == Parameters.removeDB) {
       final dialogResult = await Dialogs.confirm(
